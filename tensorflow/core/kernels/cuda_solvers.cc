@@ -502,6 +502,8 @@ static inline Status UnmqrImpl(BufSizeFnT bufsize, SolverFnT solver,
 // Unfortunately the LAPACK function name differs for the real and complex case
 // (complex ones are prefixed with "UN" for "unitary"), so we instantiate each
 // one separately.
+
+#if CUDA_VERSION >= 8000
 #define UNMQR_INSTANCE(Scalar, function_prefix, type_prefix)                  \
   template <>                                                                 \
   Status CudaSolver::Unmqr(cublasSideMode_t side, cublasOperation_t trans,    \
@@ -599,6 +601,7 @@ HEEVD_INSTANCE(float, sy, S);
 HEEVD_INSTANCE(double, sy, D);
 HEEVD_INSTANCE(complex64, he, C);
 HEEVD_INSTANCE(complex128, he, Z);
+#endif
 
 template <typename Scalar, typename BufSizeFnT, typename SolverFnT>
 static inline Status GesvdImpl(

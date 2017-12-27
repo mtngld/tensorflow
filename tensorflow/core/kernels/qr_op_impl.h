@@ -122,6 +122,7 @@ class QrOp : public LinearAlgebraOp<Scalar> {
 };
 
 #if GOOGLE_CUDA
+#if CUDA_VERSION >= 8000
 
 typedef Eigen::GpuDevice GPUDevice;
 
@@ -294,6 +295,7 @@ class QrOpGpu : public AsyncOpKernel {
   TF_DISALLOW_COPY_AND_ASSIGN(QrOpGpu);
 };
 
+#endif
 #endif
 
 }  // namespace tensorflow

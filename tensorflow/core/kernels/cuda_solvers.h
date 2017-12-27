@@ -278,10 +278,12 @@ class CudaSolver {
   // supported.
   // Returns Status::OK() if the kernel was launched successfully.
   // See: http://docs.nvidia.com/cuda/cusolver/#cuds-lt-t-gt-ormqr
+  #if CUDA_VERSION >= 8000
   template <typename Scalar>
   Status Unmqr(cublasSideMode_t side, cublasOperation_t trans, int m, int n,
                int k, const Scalar* dev_a, int lda, const Scalar* dev_tau,
                Scalar* dev_c, int ldc, int* dev_lapack_info) TF_MUST_USE_RESULT;
+  #endif
 
   // Overwrites QR factorization produced by Geqrf by the unitary Householder
   // matrix Q. On input, the Householder matrix Q is represented by the output
@@ -289,17 +291,21 @@ class CudaSolver {
   // first n columns of Q. Requires m >= n >= 0.
   // Returns Status::OK() if the kernel was launched successfully.
   // See: http://docs.nvidia.com/cuda/cusolver/#cuds-lt-t-gt-orgqr
+  #if CUDA_VERSION >= 8000
   template <typename Scalar>
   Status Ungqr(int m, int n, int k, Scalar* dev_a, int lda,
                const Scalar* dev_tau, int* dev_lapack_info) TF_MUST_USE_RESULT;
+  #endif
 
   // Hermitian (Symmetric) Eigen decomposition.
   // See: http://docs.nvidia.com/cuda/cusolver/#cuds-lt-t-gt-syevd
+  #if CUDA_VERSION >= 8000
   template <typename Scalar>
   Status Heevd(cusolverEigMode_t jobz, cublasFillMode_t uplo, int n,
                Scalar* dev_A, int lda,
                typename Eigen::NumTraits<Scalar>::Real* dev_W,
                int* dev_lapack_info) TF_MUST_USE_RESULT;
+  #endif
 
   // Singular value decomposition.
   // Returns Status::OK() if the kernel was launched successfully.

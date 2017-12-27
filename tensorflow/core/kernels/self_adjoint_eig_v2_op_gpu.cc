@@ -16,6 +16,7 @@ limitations under the License.
 // See docs in ../ops/linalg_ops.cc.
 
 #if GOOGLE_CUDA
+#if CUDA_VERSION >= 8000
 
 #include <numeric>
 #include <type_traits>
@@ -181,3 +182,4 @@ REGISTER(complex128);
 }  // namespace tensorflow
 
 #endif  // GOOGLE_CUDA
+#endif  // CUDA_VERSION >= 8000

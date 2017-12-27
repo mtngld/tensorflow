@@ -20,7 +20,9 @@ namespace tensorflow {
 REGISTER_LINALG_OP("Qr", (QrOp<complex64>), complex64);
 
 #if GOOGLE_CUDA
+#if CUDA_VERSION >= 8000
 REGISTER_LINALG_OP_GPU("Qr", (QrOpGpu<complex64>), complex64);
+#endif
 #endif
 
 }  // namespace tensorflow
