@@ -35,6 +35,7 @@ __all__ = [
 def gan_head(generator_loss_fn, discriminator_loss_fn, generator_optimizer,
              discriminator_optimizer, use_loss_summaries=True,
              get_hooks_fn=tfgan_train.get_sequential_train_hooks(),
+             get_metrics_fn=None,
              name=None):
   """Creates a `GANHead`.
 
@@ -62,6 +63,7 @@ def gan_head(generator_loss_fn, discriminator_loss_fn, generator_optimizer,
                  discriminator_optimizer=discriminator_optimizer,
                  use_loss_summaries=use_loss_summaries,
                  get_hooks_fn=get_hooks_fn,
+                 get_metrics_fn=get_metrics_fn,
                  name=name)
 
 
@@ -72,6 +74,7 @@ class GANHead(head._Head):  # pylint: disable=protected-access
                generator_optimizer, discriminator_optimizer,
                use_loss_summaries=True,
                get_hooks_fn=None,
+               get_metrics_fn=None,
                name=None):
     """`Head` for GAN training.
 
@@ -92,6 +95,8 @@ class GANHead(head._Head):  # pylint: disable=protected-access
     """
     if get_hooks_fn is None:
       get_hooks_fn = tfgan_train.get_sequential_train_hooks()
+    if get_metrics_fn is None:
+      get_metrics_fn = lambda gan_model: return {}
     # TODO(joelshor): Validate inputs.
 
     if use_loss_summaries in [True, False]:
@@ -104,6 +109,7 @@ class GANHead(head._Head):  # pylint: disable=protected-access
     self._generator_optimizer = generator_optimizer
     self._discriminator_optimizer = discriminator_optimizer
     self._get_hooks_fn = get_hooks_fn
+    self._get_metrics_fn = get_metrics_fn
 
   @property
   def name(self):
@@ -173,13 +179,14 @@ class GANHead(head._Head):  # pylint: disable=protected-access
         gan_loss = self.create_loss(
             features=None, mode=mode, logits=gan_model, labels=None)
         scalar_loss = gan_loss.generator_loss + gan_loss.discriminator_loss
+        eval_metrics_ops = self._get_metrics_fn(gan_model)
         return model_fn_lib.EstimatorSpec(
             mode=model_fn_lib.ModeKeys.EVAL,
             predictions=gan_model.generated_data,
             loss=scalar_loss,
             # TODO(joelshor): Add metrics. If head name provided, append it to
             # metric keys.
-            eval_metric_ops={})
+            eval_metric_ops=eval_metric_ops)
       elif mode == model_fn_lib.ModeKeys.TRAIN:
         if train_op_fn is None:
           raise ValueError('train_op_fn can not be None.')
